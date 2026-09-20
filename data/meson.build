@@ -75,7 +75,6 @@ i18n.merge_file(
     type: 'xml'
 )
 
-
 install_data(
     join_paths(meson.current_source_dir(),'schemas', 'io.elementary.files' + '.gschema.xml'),
     rename: ['com.github.jeremypw.files-testing.gschema.xml'],

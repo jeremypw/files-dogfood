@@ -81,7 +81,7 @@ public class Files.MimeActions {
 
     public static List<AppInfo> get_applications_for_file (Files.File file) {
         List<AppInfo> result = null;
-        string? type = file.get_ftype ();
+        string? type = file.content_type;
         if (type == null) {
             return result;
         }
@@ -145,7 +145,7 @@ public class Files.MimeActions {
             if (previous_file == null) {
                 result = get_applications_for_file (file);
                 if (result == null) {
-                    debug ("No application found for %s", file.get_ftype ());
+                    debug ("No application found for %s", file.content_type);
                     return result;
                 }
                 previous_file = file;
@@ -190,7 +190,7 @@ public class Files.MimeActions {
     }
 
     private static int file_compare_by_mime_type (Files.File a, Files.File b) {
-        return strcmp (a.get_ftype (), b.get_ftype ());
+        return strcmp (a.content_type, b.content_type);
     }
 
     private static string? gof_get_parent_uri (Files.File file) {
@@ -252,11 +252,11 @@ public class Files.MimeActions {
         return get_default_application_for_file (Files.File.@get (file));
     }
 
-    public static void open_glib_file_request (GLib.File file_to_open, Gtk.Widget parent, AppInfo? app = null) {
+    public static async void open_glib_file_request (GLib.File file_to_open, Gtk.Widget parent, AppInfo? app = null) {
         /* Note: This function should be only called if file_to_open is not an executable or it is not
          * intended to execute it (AbstractDirectoryView takes care of this) */
         if (app == null) {
-            var choice = choose_app_for_glib_file (file_to_open, parent);
+            var choice = yield choose_app_for_glib_file (file_to_open, parent);
             if (choice != null) {
                 launch_glib_file_with_app (file_to_open, parent, choice);
             }
@@ -292,9 +292,9 @@ public class Files.MimeActions {
         }
     }
 
-    public static AppInfo? choose_app_for_glib_file (GLib.File file_to_open, Gtk.Widget parent) {
+    public static async AppInfo? choose_app_for_glib_file (GLib.File file_to_open, Gtk.Widget parent) {
         var chooser = new PF.ChooseAppDialog (Files.get_active_window (), file_to_open);
-        return chooser.get_app_info ();
+        return yield chooser.get_app_info ();
     }
 
      private static void launch_glib_file_with_app (GLib.File file_to_open, Gtk.Widget parent, AppInfo app) {

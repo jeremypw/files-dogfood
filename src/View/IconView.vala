@@ -96,7 +96,7 @@ public class Files.IconView : Files.AbstractDirectoryView {
     public override Gtk.TreePath? get_path_at_pos (int win_x, int win_y) {
         /* Supplied coords are drag coords - need IconView bin window coords */
         /* Icon view does not scroll horizontally so no adjustment needed for x coord*/
-        return tree.get_path_at_pos (win_x, win_y + (int)(get_vadjustment ().get_value ()));
+        return tree.get_path_at_pos (win_x, win_y + (int)(scrolled_window.get_vadjustment ().get_value ()));
     }
 
     public override void tree_select_all () {
@@ -172,7 +172,7 @@ public class Files.IconView : Files.AbstractDirectoryView {
                 /* rectangles are in bin window coordinates - need to adjust event y coordinate
                  * for vertical scrolling in order to accurately detect which area of TextRenderer was
                  * clicked on */
-                y -= (int)(get_vadjustment ().value);
+                y -= (int)(scrolled_window.get_vadjustment ().value);
                 Gtk.TreeIter iter;
                 model.get_iter (out iter, path);
                 string? text = null;
@@ -243,11 +243,21 @@ public class Files.IconView : Files.AbstractDirectoryView {
 
     /* Override native Gtk.IconView cursor handling */
     protected override bool move_cursor (uint keyval, bool only_shift_pressed, bool control_pressed) {
+        uint prev_key;
+        uint next_key;
+        if (Gtk.StateFlags.DIR_RTL in get_style_context ().get_state ()) {
+            prev_key = Gdk.Key.Right;
+            next_key = Gdk.Key.Left;
+        } else {
+            prev_key = Gdk.Key.Left;
+            next_key = Gdk.Key.Right;
+        }
+
         Gtk.TreePath? path = get_path_at_cursor ();
         if (path != null) {
-            if (keyval == Gdk.Key.Right) {
+            if (keyval == next_key) {
                 path.next (); /* Does not check if path is valid */
-            } else if (keyval == Gdk.Key.Left) {
+            } else if (keyval == prev_key) {
                 path.prev ();
             } else if (keyval == Gdk.Key.Up) {
                 path = up (path);

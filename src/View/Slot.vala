@@ -28,8 +28,8 @@ namespace Files.View {
         private uint path_change_timeout_id = 0;
         private bool original_reload_request = false;
 
-        private const string EMPTY_MESSAGE = _("This Folder Is Empty");
-        private const string EMPTY_TRASH_MESSAGE = _("Trash Is Empty");
+        private const string EMPTY_MESSAGE = _("This Folder does not contain any files");
+        private const string EMPTY_TRASH_MESSAGE = _("Trash does not contain any files");
         private const string EMPTY_RECENT_MESSAGE = _("There Are No Recent Files");
         private const string DENIED_MESSAGE = _("Access Denied");
 
@@ -102,7 +102,7 @@ namespace Files.View {
 
             /* Miller View creates its own overlay and handles packing of the directory view */
             if (mode != ViewMode.MILLER_COLUMNS) {
-                add_overlay (dir_view);
+                add_overlay_widget (dir_view);
             }
 
             connect_dir_signals ();
@@ -177,6 +177,7 @@ namespace Files.View {
 
             /*  Column View requires slots to determine their own width (other views' width determined by Window */
             if (mode == ViewMode.MILLER_COLUMNS) {
+                //TODO See if need to adjust width now using stack to show empty message
                 if (dir.is_empty ()) { /* No files in the file cache */
                     Pango.Rectangle extents;
                     var layout = dir_view.create_pango_layout (null);

@@ -83,7 +83,7 @@ public class Files.Plugins.Trash : Files.Plugins.Base {
                     }
 
                     unowned GLib.List<Files.File> selection = view.get_selected_files ();
-                    FileUtils.restore_files_from_trash (selection, window);
+                    FileUtils.restore_files_from_trash.begin (selection, window);
                 });
 
                 delete_button.clicked.connect (() => {
@@ -113,13 +113,13 @@ public class Files.Plugins.Trash : Files.Plugins.Base {
                 });
 
                 view.add_extra_action_widget (actionbar);
+                actionbar.show_all ();
                 actionbars.@set (view, actionbar);
             }
-
-            set_actionbar (actionbar);
         } else if (actionbar != null) {  /* not showing trash directory */
-            actionbar.destroy ();
             actionbars.unset (view);
+            actionbar.destroy ();
+            actionbar = null;
         }
     }
 
